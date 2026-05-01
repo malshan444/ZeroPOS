@@ -1,5 +1,7 @@
 # ZeroPOS
 
+[![Download Latest Release](https://img.shields.io/github/v/release/malshan444/ZeroPOS?color=brightgreen&label=Download%20Latest%20.exe&style=for-the-badge)](https://github.com/malshan444/ZeroPOS/releases/latest)
+
 A sleek, modern, and entirely offline Point of Sale (POS) application built for speed and reliability. ZeroPOS is designed to run seamlessly on Windows machines as a native application without requiring an internet connection.
 
 ## ✨ Features
