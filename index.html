@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZeroPOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+  <!-- Custom Titlebar -->
+  <div id="titlebar">
+    <div id="drag-region">
+      <div id="window-title">ZeroPOS</div>
+    </div>
+    <div id="window-controls">
+      <div class="button" id="min-button"><i data-lucide="minus"></i></div>
+      <div class="button" id="max-button"><i data-lucide="square"></i></div>
+      <div class="button" id="close-button"><i data-lucide="x"></i></div>
+    </div>
+  </div>
+
+  <!-- Login Screen -->
+  <div id="login-screen" class="active glass-panel">
+    <div class="login-box">
+      <h1 id="login-restaurant-name">ZeroPOS</h1>
+      <p id="login-tagline">Enter your PIN to continue</p>
+      <div class="pin-display">
+        <div class="pin-dots">
+          <div class="pin-dot"></div>
+          <div class="pin-dot"></div>
+          <div class="pin-dot"></div>
+          <div class="pin-dot"></div>
+        </div>
+      </div>
+      <div class="numpad">
+        <button class="num-btn">1</button>
+        <button class="num-btn">2</button>
+        <button class="num-btn">3</button>
+        <button class="num-btn">4</button>
+        <button class="num-btn">5</button>
+        <button class="num-btn">6</button>
+        <button class="num-btn">7</button>
+        <button class="num-btn">8</button>
+        <button class="num-btn">9</button>
+        <button class="num-btn action-btn" id="pin-clear">C</button>
+        <button class="num-btn">0</button>
+        <button class="num-btn action-btn primary" id="pin-enter">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App Layout -->
+  <div id="app-layout">
+    <nav id="sidebar">
+      <div class="nav-links">
+        <button class="nav-btn active" data-tab="register"><i
+            data-lucide="layout-grid"></i><span>Register</span></button>
+        <button class="nav-btn" data-tab="items"><i data-lucide="package"></i><span>Items</span></button>
+        <button class="nav-btn" data-tab="reports"><i data-lucide="bar-chart-2"></i><span>Reports</span></button>
+      </div>
+      <div class="nav-bottom">
+        <button class="nav-btn" id="fullscreen-btn"><i data-lucide="maximize"></i><span>Fullscreen</span></button>
+        <button class="nav-btn" id="settings-btn"><i data-lucide="settings"></i><span>Settings</span></button>
+      </div>
+    </nav>
+
+    <main id="main-content">
+      <!-- Register Tab -->
+      <section id="tab-register" class="tab-content active">
+        <div class="register-layout">
+          <div class="menu-section">
+            <div class="category-filters" id="category-filters">
+              <!-- Rendered via JS -->
+            </div>
+            <div class="item-grid" id="item-grid">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+          <div class="cart-section glass-panel">
+            <div class="cart-header">
+              <h2>Current Order</h2>
+              <div class="cart-actions" style="display:flex;gap:8px;">
+                <button id="reprint-btn" class="small-btn" style="display:flex;align-items:center;gap:4px;"><i
+                    data-lucide="printer" style="width:14px;height:14px;"></i> Reprint Last</button>
+              </div>
+            </div>
+            <div class="cart-items" id="cart-items">
+              <!-- Rendered via JS -->
+            </div>
+            <div class="cart-summary">
+              <input type="text" id="order-note" placeholder="Order Note (Optional)">
+
+              <div class="summary-row">
+                <span>Subtotal</span>
+                <span id="cart-subtotal">0.00</span>
+              </div>
+
+              <div class="summary-row input-row">
+                <span>Discount (%)</span>
+                <div class="input-group">
+                  <input type="number" id="discount-input" min="0" max="100" placeholder="0">
+                  <button id="apply-discount-btn" class="small-btn">Apply</button>
+                  <button id="clear-discount-btn" class="small-btn" style="display:none;"><i data-lucide="x"
+                      style="width:14px;height:14px;"></i></button>
+                </div>
+              </div>
+              <div class="summary-row" id="discount-display-row" style="display: none;">
+                <span>Discount (<span id="discount-percent-display">0</span>%)</span>
+                <span id="cart-discount">-0.00</span>
+              </div>
+
+              <div class="summary-row input-row">
+                <span>Service Chg (%)</span>
+                <div class="input-group">
+                  <input type="number" id="sc-input" min="0" max="100" placeholder="0">
+                  <button id="apply-sc-btn" class="small-btn">Apply</button>
+                  <button id="clear-sc-btn" class="small-btn" style="display:none;"><i data-lucide="x"
+                      style="width:14px;height:14px;"></i></button>
+                </div>
+              </div>
+              <div class="summary-row" id="sc-display-row" style="display: none;">
+                <span>Service Charge (<span id="sc-percent-display">0</span>%)</span>
+                <span id="cart-sc">+0.00</span>
+              </div>
+
+              <div class="summary-row total-row">
+                <span>Total</span>
+                <span id="cart-total" class="gradient-text">0.00</span>
+              </div>
+
+              <button id="checkout-btn" class="primary-btn checkout-btn" disabled>Checkout</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Items Tab -->
+      <section id="tab-items" class="tab-content">
+        <div class="items-mgmt-layout" style="display:flex;flex-direction:column;gap:24px;height:100%;">
+          <!-- Categories Section -->
+          <div class="mgmt-section glass-panel" style="padding: 24px; border-radius: 16px;">
+            <div class="tab-header">
+              <h2>Categories</h2>
+              <button class="primary-btn" id="add-category-btn">Add Category</button>
+            </div>
+            <div class="table-container">
+              <table id="categories-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Sort Order</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Rendered via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Items Section -->
+          <div class="mgmt-section glass-panel"
+            style="padding: 24px; border-radius: 16px; flex: 1; display:flex; flex-direction:column; overflow:hidden;">
+            <div class="tab-header">
+              <h2>Items</h2>
+              <button class="primary-btn" id="add-item-btn">Add Item</button>
+            </div>
+            <div class="table-container" style="flex:1; overflow-y:auto;">
+              <table id="items-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Rendered via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Reports Tab -->
+      <section id="tab-reports" class="tab-content">
+        <div class="tab-header">
+          <h2>Reports</h2>
+          <div class="report-filters">
+            <select id="report-type">
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+              <option value="eom">End of Month</option>
+            </select>
+            <input type="date" id="report-date">
+            <button class="primary-btn" id="generate-report-btn">Generate</button>
+            <button class="secondary-btn" id="export-csv-btn" style="display:flex;align-items:center;gap:8px;"><i
+                data-lucide="download" style="width:16px;height:16px;"></i> Export CSV</button>
+          </div>
+        </div>
+        <div class="summary-cards" id="report-summaries">
+          <div class="card glass-panel">
+            <h3>Transactions</h3>
+            <p id="rep-transactions">0</p>
+          </div>
+          <div class="card glass-panel">
+            <h3>Gross Revenue</h3>
+            <p id="rep-gross">0.00</p>
+          </div>
+          <div class="card glass-panel">
+            <h3>Discounts</h3>
+            <p id="rep-discounts">0.00</p>
+          </div>
+          <div class="card glass-panel">
+            <h3>Service Charges</h3>
+            <p id="rep-sc">0.00</p>
+          </div>
+          <div class="card accent glass-panel">
+            <h3>Net Revenue</h3>
+            <p id="rep-net">0.00</p>
+          </div>
+        </div>
+        <div class="table-container glass-panel" style="border-radius: 16px;">
+          <table id="reports-table">
+            <thead>
+              <tr>
+                <th>Receipt #</th>
+                <th>Date & Time</th>
+                <th>Payment</th>
+                <th>Total</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modals -->
+  <div id="modal-overlay" class="modal-overlay"></div>
+
+  <!-- Custom Item Modal -->
+  <div id="custom-item-modal" class="modal glass-panel">
+    <div class="modal-header">
+      <h2>Add Custom Item</h2>
+      <button class="close-modal-btn"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Item Name</label>
+        <input type="text" id="custom-item-name" placeholder="e.g. Extra Packaging">
+      </div>
+      <div class="form-group">
+        <label>Price</label>
+        <input type="number" id="custom-item-price" min="0" step="0.01" placeholder="0.00">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="secondary-btn close-modal-btn">Cancel</button>
+      <button class="primary-btn" id="add-custom-item-btn">Add to Cart</button>
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div id="checkout-modal" class="modal glass-panel">
+    <div class="modal-header">
+      <h2>Checkout</h2>
+      <button class="close-modal-btn"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body checkout-layout">
+      <div class="checkout-summary">
+        <h3>Order Total</h3>
+        <div class="grand-total gradient-text" id="checkout-total-display">0.00</div>
+        <div class="payment-methods">
+          <button class="pm-btn active" data-method="Cash">Cash</button>
+          <button class="pm-btn" data-method="Card">Card</button>
+          <button class="pm-btn" data-method="Online">Online</button>
+        </div>
+        <input type="text" id="checkout-note-input" placeholder="Order Note (Optional)">
+      </div>
+      <div class="cash-section glass-panel-inner" id="cash-section"
+        style="padding:24px; border-radius:12px; background: rgba(0,0,0,0.3);">
+        <div class="cash-input-group">
+          <label>Cash Received</label>
+          <input type="number" id="cash-received-input" placeholder="0">
+        </div>
+        <div class="quick-cash" id="quick-cash-grid">
+          <!-- Rendered via JS -->
+        </div>
+        <div class="change-display">
+          <span>Change:</span>
+          <span id="change-amount">0.00</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="secondary-btn close-modal-btn">Cancel</button>
+      <button class="primary-btn" id="confirm-sale-btn">Confirm Sale & Print</button>
+    </div>
+  </div>
+
+  <!-- Add/Edit Category Modal -->
+  <div id="add-category-modal" class="modal glass-panel">
+    <div class="modal-header">
+      <h2 id="cat-modal-title">Add Category</h2>
+      <button class="close-modal-btn"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="cat-id-input">
+      <div class="form-group">
+        <label>Category Name</label>
+        <input type="text" id="cat-name-input">
+      </div>
+      <div class="form-group">
+        <label>Sort Order</label>
+        <input type="number" id="cat-sort-input" value="1">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="secondary-btn close-modal-btn">Cancel</button>
+      <button class="primary-btn" id="save-category-btn">Save</button>
+    </div>
+  </div>
+
+  <!-- Add/Edit Item Modal -->
+  <div id="item-modal" class="modal glass-panel">
+    <div class="modal-header">
+      <h2 id="item-modal-title">Add Item</h2>
+      <button class="close-modal-btn"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="item-id-input">
+      <div class="form-group">
+        <label>Item Name</label>
+        <input type="text" id="item-name-input">
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select id="item-category-select"></select>
+      </div>
+      <div class="form-group">
+        <label>Price</label>
+        <input type="number" id="item-price-input" min="0" step="0.01">
+      </div>
+      <div class="form-group row-group">
+        <label>Active</label>
+        <input type="checkbox" id="item-active-input" checked>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="secondary-btn close-modal-btn">Cancel</button>
+      <button class="primary-btn" id="save-item-btn">Save</button>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="modal glass-panel">
+    <div class="modal-header">
+      <h2>Settings</h2>
+      <button class="close-modal-btn"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Restaurant Name</label>
+        <input type="text" id="set-name">
+      </div>
+      <div class="form-group">
+        <label>Tagline</label>
+        <input type="text" id="set-tagline">
+      </div>
+      <div class="form-group">
+        <label>Address</label>
+        <input type="text" id="set-address">
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="text" id="set-phone">
+      </div>
+      <hr style="border-color: rgba(255,255,255,0.1); margin: 20px 0;">
+      <div class="form-group">
+        <label>Currency Symbol</label>
+        <input type="text" id="set-currency" placeholder="e.g. Rs., $, €">
+      </div>
+      <div class="form-group">
+        <label>Change PIN (4-digit)</label>
+        <input type="password" id="set-pin" maxlength="4">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="secondary-btn close-modal-btn">Cancel</button>
+      <button class="primary-btn" id="save-settings-btn">Save Settings</button>
+    </div>
+  </div>
+
+  <!-- Print Area -->
+  <div id="print-area">
+    <div class="receipt">
+      <div class="receipt-header">
+        <h1 id="r-name">ZeroPOS</h1>
+        <p id="r-tagline">The ultimate offline POS</p>
+        <p id="r-address">Colombo, Sri Lanka</p>
+        <p id="r-phone">+94 77 123 4567</p>
+      </div>
+      <div class="receipt-meta">
+        <p>Receipt #: <span id="r-id">1001</span></p>
+        <p>Date: <span id="r-date">2026-05-01 12:00:00</span></p>
+      </div>
+      <table class="receipt-items">
+        <thead>
+          <tr>
+            <th class="left">Item</th>
+            <th class="center">Qty</th>
+            <th class="right">Total</th>
+          </tr>
+        </thead>
+        <tbody id="r-items-list">
+        </tbody>
+      </table>
+      <div class="receipt-totals">
+        <div class="r-row"><span>Subtotal:</span><span id="r-subtotal">0.00</span></div>
+        <div class="r-row" id="r-discount-row"><span>Discount:</span><span id="r-discount">0.00</span></div>
+        <div class="r-row" id="r-sc-row"><span>Service Charge:</span><span id="r-sc">0.00</span></div>
+        <div class="r-row r-grand-total"><span>Total:</span><span id="r-total">0.00</span></div>
+      </div>
+      <div class="receipt-payment">
+        <div class="r-row"><span>Method:</span><span id="r-method">Cash</span></div>
+        <div class="r-row" id="r-cash-row"><span>Cash Recv:</span><span id="r-cash">0.00</span></div>
+        <div class="r-row" id="r-change-row"><span>Change:</span><span id="r-change">0.00</span></div>
+      </div>
+      <div class="receipt-footer">
+        <p>Thank you for your business!</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+
+</html>

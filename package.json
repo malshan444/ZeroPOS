@@ -1,0 +1,40 @@
+{
+  "name": "zeropos",
+  "version": "1.0.0",
+  "description": "ZeroPOS - Electron POS application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder build --win --x64",
+    "build:arm": "electron-builder build --win --arm64",
+    "build:all": "electron-builder build --win --x64 --arm64"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "sql.js": "^1.14.1"
+  },
+  "devDependencies": {
+    "electron": "^41.4.0",
+    "electron-builder": "^26.8.1"
+  },
+  "build": {
+    "appId": "com.zeropos.app",
+    "productName": "ZeroPOS",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "devDependencies": {
+    "electron-builder": "^26.8.1"
+  }
+}
